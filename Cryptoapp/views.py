@@ -2,12 +2,11 @@ from django.shortcuts import render,redirect
 from django.http import JsonResponse
 from .models import Cryptocurrency
 from pycoingecko import CoinGeckoAPI
-from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from Cryptoapp.form import SignUpForm
 import logging
-from django.http import HttpResponse
+
 
 
 
@@ -25,7 +24,7 @@ def home(request):
         user=authenticate(request,username=username,password=password)
         if user is not None:
             login(request, user)
-            messages.success(request, "You have been logged in ")
+            messages.success(request,"Hi You have been logged in")
             return redirect('home')
         else:
             messages.success(request,"There was an error while logging in! Please try again!")
@@ -51,10 +50,12 @@ def register_users(request):
             form.save()
             #Authenticate and login
             username=form.cleaned_data['username']
-            password=form.cleaned_data['password']
+            password=form.cleaned_data['password1']
+            
             user=authenticate(username=username,password=password)
             login(request,user)
-            messages.success(request,"You have successfully registered here!")
+            firstname=user.first_name   
+            messages.success(request,f"Congratulations! {firstname} You have successfully registered here!")
             return redirect('home')
         
     else: 
@@ -91,13 +92,6 @@ def display_cryptocurrencies(request):
 
     return render(request, 'cryptoprice.html', {'cryptocurrencies': cryptocurrencies})
 
-
-
-
-
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .models import Cryptocurrency
 
 def store_the_data(request, symbol):
     if request.method == 'POST':
