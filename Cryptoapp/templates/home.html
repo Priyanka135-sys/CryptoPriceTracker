@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{%block content%}
+
+<div class="col-md-6 offset-md-3 ">
+
+{%if user.is_authenticated %}
+
+<h1 >Welcome to Crypto Currency Portal</h1>
+<h2>Have look at the current records!</h2>
+
+</div>
+
+
+    
+{%if cryptocurrencies%}
+
+<h1 class="mb-4">Cryptocurrency Prices</h1>
+<div style="overflow-x:auto;">
+    <table class="table table-striped table-hover table-bordered mx-auto" border="2">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Symbol</th>
+                <th scope="col">Current Prices</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            {% for crypto in cryptocurrencies %}
+                <tr>
+                    <td>{{ crypto.name }}</td>
+                    <td>{{ crypto.symbol }}</td>
+                    <td>${{ crypto.current_price }}</td>
+                    
+                </tr>
+            {% endfor %}
+       
+       
+{%endif%}
+    </tbody>
+      </table>
+
+
+{%else%}
+
+<div>
+<h1>Login</h1>
+
+</br>
+<form method="post" action="{%url 'home'%}">
+    {%csrf_token %}
+
+    <form>
+    
+        <div class="mb-3">
+          
+          <input type="text" class="form-control" name="username" placeholder="First Name" required>
+
+        </div>
+          
+        <div class="mb-3">
+         
+          <input type="password" class="form-control" name="password" placeholder="password" required>
+        </div>
+        
+        <button type="submit" class="btn btn-secondary">Login</button>
+      </form>
+
+</form>
+</div>
+
+{% endif %}
+
+{% endblock %}

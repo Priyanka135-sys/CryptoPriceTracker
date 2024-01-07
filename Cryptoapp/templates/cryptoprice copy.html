@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Cryptocurrency Prices</title>
+
+    <!-- Include Bootstrap CSS -->
+    <!-- Include TradingView charting library -->
+    <script type="text/javascript" src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    
+    <style>
+        body {
+          background: #fff;
+        }
+        
+        .center {
+            text-align: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+              
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+              
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }    
+
+        /* Add style for the interval selector */
+        select {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="center">
+        <h2>Check the records...</h2>
+        
+        <h1 class="mb-4">Cryptocurrency Prices</h1>
+        <div style="overflow-x:auto;">
+            <table class="table table-striped table-hover table-bordered mx-auto" border="2">
+                <!-- Your existing table content -->
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Symbol</th>
+                        <th scope="col">Current Prices</th>
+                        <th scope="col">Show Chart</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for crypto in cryptocurrencies %}
+                        <tr>
+                            <td>{{ crypto.name }}</td>
+                            <td>{{ crypto.symbol }}</td>
+                            <td>${{ crypto.current_price }}</td>
+                            <td><button onclick="openChart('{{ crypto.symbol }}')">Show Chart</button></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <!-- Removed the chart container from here -->
+        </div>
+    </div>
+
+    <script>
+        function openChart(symbol) {
+            // Open a new window with the chart
+            const chartWindow = window.open('', '_blank');
+
+            // Add time interval selector
+            const intervalSelector = document.createElement('select');
+            intervalSelector.innerHTML = `
+                <option value="1">1 Hour</option>
+                <option value="4">4 Hours</option>
+                <option value="24">1 Day</option>
+                <option value="96">4 Days</option>
+                <option value="168">1 Week</option>
+            `;
+
+            intervalSelector.addEventListener('change', (event) => {
+                const selectedInterval = event.target.value;
+
+                // Update chart data based on the selected interval
+                fetch(`http://127.0.0.1:8000/chart/${symbol}/?interval=${selectedInterval}`)
+                    .then(response => response.json())
+                    .then(newData => {
+                        const updatedChartData = newData.data.map(entry => ({
+                            time: entry[0],
+                            value: entry[1],
+                        }));
+
+                        // Update the series with the new data
+                        series.setData(updatedChartData);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching updated data:', error);
+                    });
+            });
+
+            chartWindow.document.body.appendChild(intervalSelector);
+
+            // Fetch data using the symbol
+            fetch(`http://127.0.0.1:8000/chart/${symbol}/`)
+                .then(response => response.json())
+                .then(data => {
+                    // Process data for TradingView
+                    const chartData = data.data.map(entry => ({
+                        time: entry[0],
+                        value: entry[1],
+                    }));
+
+                    // Create a TradingView chart in the new window
+                    const chart = LightweightCharts.createChart(chartWindow.document.body, {
+                        width: 800,
+                        height: 400,
+                        layout: {
+                            backgroundColor: '#1E1E1E', // Dark background color
+                            textColor: '#D9D9D9', // Light text color
+                        },
+                        grid: {
+                            vertLines: {
+                                color: '#2B2B2B', // Vertical grid lines color
+                            },
+                            horzLines: {
+                                color: '#2B2B2B', // Horizontal grid lines color
+                            },
+                        },
+                        priceScale: {
+                            borderColor: '#2B2B2B', // Border color of the price scale
+                        },
+                    });
+
+                    // Add a line series
+                    const series = chart.addLineSeries();
+
+                    // Update the series with the processed data
+                    series.setData(chartData);
+
+                    // Add a beautiful heading
+                    const heading = document.createElement('h2');
+                    heading.innerText = `Below chart shows the trend of Crypto Currency ${symbol}`;
+                    chartWindow.document.body.prepend(heading); // prepend to position it at the top
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Other initialization code if needed
+        });
+    </script>
+</body>
+</html>
