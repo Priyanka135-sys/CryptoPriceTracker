@@ -95,7 +95,11 @@ def display_cryptocurrencies(request):
 
 
 
-def update_the_data(request, symbol):
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Cryptocurrency
+
+def store_the_data(request, symbol):
     if request.method == 'POST':
         latest_crypto = Cryptocurrency.objects.filter(symbol=symbol).order_by('-timestamp').first()
 
@@ -107,7 +111,8 @@ def update_the_data(request, symbol):
         
         return redirect('home')  # Replace 'your_redirect_url' with the actual URL you want to redirect to
 
-    return render(request, 'updatedata.html', {'symbol': symbol})
+    return render(request, 'store_data.html', {'symbol': symbol})
+
 
     
 def get_historical_data(symbol):

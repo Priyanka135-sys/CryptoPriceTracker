@@ -1,0 +1,19 @@
+<!-- store_data.html -->
+{% extends "base.html" %}
+{%block content%}
+
+<div class="col-md-6 offset-md-3 ">
+
+<h1 >Welcome to Crypto Currency Portal</h1>
+<h2>Have look at the current records!</h2>
+
+</div>
+
+
+<form method="post" action="{% url 'store_data' symbol=symbol %}">
+    {% csrf_token %}
+    <button type="submit"  style="display: flex; justify-content: center; align-items: center; background-color: #ff0000; color: #ffffff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Save Data</button>
+    
+
+</form>
+{% endblock %}
