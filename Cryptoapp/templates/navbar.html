@@ -9,13 +9,11 @@
           {%if user.is_authenticated%}
 
           <li class="nav-item">
-            <a class="nav-link" href=" {% url 'display_data' %} ">View Prices and charts</a>
+            <a class="nav-link" href=" {% url 'display_data' %} ">View charts</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-          
 
-          
           {%else%}
 
           <li class="nav-item">

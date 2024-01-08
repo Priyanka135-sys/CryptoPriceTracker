@@ -12,4 +12,5 @@ urlpatterns = [
     path('logout/',views.logout_users,name='logout'),
     path('viewdata/',views.display_cryptocurrencies,name='display_data'),
     
+    
 ]

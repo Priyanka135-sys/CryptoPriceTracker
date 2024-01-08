@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Cryptocurrency Prices</title>
+
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <!-- Include TradingView charting library -->
+    <script type="text/javascript" src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+
+    <style>
+        body {
+            background: #fff;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .custom-btn {
+            background-color: #ff0000;
+            /* Red color */
+            color: #ffffff;
+            /* White text */
+            padding: 10px 20px;
+            /* Adjust padding as needed */
+            border: none;
+            border-radius: 5px;
+            /* Rounded corners */
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+    <div class="center">
+        <h2>Check the records...</h2>
+
+        <h1 class="mb-4">Cryptocurrency Prices</h1>
+        <div style="overflow-x:auto;">
+            <table class="table table-striped table-hover table-bordered mx-auto" border="2">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Symbol</th>
+                        <th scope="col">Current Prices</th>
+                        <th scope="col">Show Chart</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for crypto in cryptocurrencies %}
+                    <tr>
+                        <td>{{ crypto.name }}</td>
+                        <td>{{ crypto.symbol }}</td>
+                        <td>${{ crypto.current_price }}</td>
+                        <td><button onclick="openChart('{{ crypto.name }}')">Show Chart</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br>
+
+            <button type="button" class="btn btn-lg btn-danger mt-4" onclick="window.location.href='{% url 'home' %}'">Go to Home Page</button>
+        </div>
+    </div>
+
+    <script>
+        function openChart(symbol) {
+            const currentPriceColumn = document.getElementById(`current-price-${symbol}`);
+    
+            fetch(`http://127.0.0.1:8000/chart/${symbol}/`)
+                .then(response => response.json())
+                .then(data => {
+                    // Use nullish coalescing operator to handle null or undefined currentPriceColumn
+                    currentPriceColumn?.innerText = `$${data.data[0][4]}`;
+                    
+                    // Log to console (optional)
+                    console.log(`Value for ${symbol}: $${data.data[0][4]}`);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+    
+        document.addEventListener("DOMContentLoaded", function () {
+            // Other initialization code if needed
+        });
+    </script>
+    
+</body>
+
+</html>

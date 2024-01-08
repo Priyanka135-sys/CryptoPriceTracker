@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from Cryptoapp.form import SignUpForm
 import logging
+from django.db.models import Max
 
 
 
@@ -24,6 +25,7 @@ def home(request):
         user=authenticate(request,username=username,password=password)
         if user is not None:
             login(request, user)
+            
             messages.success(request,"Hi You have been logged in")
             return redirect('home')
         else:
@@ -55,7 +57,7 @@ def register_users(request):
             user=authenticate(username=username,password=password)
             login(request,user)
             firstname=user.first_name   
-            messages.success(request,f"Congratulations! {firstname} You have successfully registered here!")
+            messages.success(request,f"Congratulations! You have successfully registered here!")
             return redirect('home')
         
     else: 
@@ -91,6 +93,7 @@ def display_cryptocurrencies(request):
             cryptocurrencies.append(latest_crypto)
 
     return render(request, 'cryptoprice.html', {'cryptocurrencies': cryptocurrencies})
+
 
 
 def store_the_data(request, symbol):
@@ -133,4 +136,16 @@ def logout_users(request):
     logout(request)
     messages.success(request,"You have logged out..")
     return redirect('home')
+
+
         
+        
+        
+        
+
+
+
+
+
+
+   
